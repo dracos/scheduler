@@ -1,0 +1,10 @@
+# AboveBrum
+LATITUDE = 
+LONGITUDE = 
+ALTITUDE = 
+FORECASTIO_KEY = 
+
+# CBeebies
+SHOWS = {
+    'Show': 'PID',
+}
