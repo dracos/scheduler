@@ -10,7 +10,6 @@ import argparse
 import os
 import re
 import sys
-import textwrap
 import requests
 import arrow
 from polybot import Bot
@@ -107,34 +106,10 @@ class SchedulerBot(Bot):
     def main(self):
         self.log.info('Posting at ' + arrow.now().format())
         for event in self.alert_on:
-            self.post_update(event)
-
-    def post_update(self, event):
-        image = event.image
-        status = event.status
-
-        max_len = 280-25 if image else 280
-        if len(status) > max_len:
-            wrapped = textwrap.wrap(status, max_len-2)
-        else:
-            wrapped = [status]
-        first = True
-        in_reply_to_id = None
-        for line in wrapped:
-            if first and len(wrapped) > 1:
-                line = u"%s\u2026" % line
-            if not first:
-                line = u"\u2026%s" % line
-
-            if image and first:
-                out = self.post(line, imagefile=image, mime_type='image/jpeg', in_reply_to_id=in_reply_to_id)
+            if event.image:
+                self.post(event.status, imagefile=event.image, mime_type='image/jpeg', wrap=True)
             else:
-                out = self.post(line, in_reply_to_id=in_reply_to_id)
-            in_reply_to_id = {
-                'twitter': out['twitter'].id if out.get('twitter') else None,
-                'mastodon': out['mastodon'].id if out.get('mastodon') else None,
-            }
-            first = False
+                self.post(event.status, wrap=True)
 
     def get_contents(self, s, mode='text'):
         if 'http://' in s or 'https://' in s:
