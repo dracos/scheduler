@@ -68,7 +68,7 @@ class CBeebiesBot(SchedulerBot):
         return sorted(events, key=lambda s: s.time)
 
     def alert(self, event, now):
-        return now >= event.time.replace(minutes=-10) and now < event.time
+        return now >= event.time.shift(minutes=-10) and now < event.time
 
 
 for key in SHOWS.keys():

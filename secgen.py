@@ -26,7 +26,7 @@ class SecgenBot(SchedulerBot):
                '|Internal server error|HTTP Error 50[17]|SQLState(?i)')
 
     def alert(self, event, now):
-        return now >= event.time and now < event.time.replace(minutes=5)
+        return now >= event.time and now < event.time.shift(minutes=5)
 
     def fetch_diff(self, a, b):
         return remove_changing_bits(a) != remove_changing_bits(b)

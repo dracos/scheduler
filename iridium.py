@@ -35,7 +35,7 @@ def get_timestamp(s):
     s = s.replace(year=now.year, tzinfo='Europe/London')
     # Deal with around New Year time
     if s < now:
-        s = s.replace(years=1)
+        s = s.shift(years=1)
     return str(s.timestamp)
 
 
@@ -97,14 +97,14 @@ class IridiumBot(SchedulerBot):
         flares = open(localfile % 'iridium.tsv')
         for row in flares:
             epoch, mag, altitude, azimuth, compass, name = row.strip().split("\t")
-            epoch = arrow.get(epoch).to('Europe/London')
+            epoch = arrow.get(epoch, 'X').to('Europe/London')
             events.append(Event(type='iridium', magnitude=mag, altitude=altitude, azimuth=azimuth,
                                 compass=compass, name=name, time=epoch, weather=weather_desc))
 
         iss = open(localfile % 'iss.tsv')
         for row in iss:
             epoch, mag, start_time, end_time, start_az, end_az, max_time, max_alt, max_az = row.strip().split("\t")
-            epoch = arrow.get(epoch).to('Europe/London')
+            epoch = arrow.get(epoch, 'X').to('Europe/London')
             events.append(
                 Event(type='iss', time=epoch,
                       magnitude=mag, start_time=start_time, end_time=end_time, start_az=start_az, end_az=end_az,
@@ -114,8 +114,8 @@ class IridiumBot(SchedulerBot):
         return sorted(events, key=lambda s: s.time)
 
     def alert(self, event, now):
-        soon = now.replace(minutes=30)
-        return soon >= event.time and soon < event.time.replace(minutes=5)
+        soon = now.shift(minutes=30)
+        return soon >= event.time and soon < event.time.shift(minutes=5)
 
 
 IridiumBot('abovebrum', LATITUDE, LONGITUDE, ALTITUDE, FORECASTIO_KEY).run()
