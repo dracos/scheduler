@@ -16,14 +16,14 @@ REGEX_TIME = re.compile('(\*?(\d+)(?:(?::|\.)\s*(\d+)|\s*(a\.?m\.?|p\.?m\.?|noon
 
 
 def remove_changing_bits(s):
-    return re.sub('^.*?view-content(?s)', '', s)
+    return re.sub('(?s)^.*?view-content', '', s)
 
 
 class SecgenBot(SchedulerBot):
     localfile = '/home/bots/data/%s-schedule'
 
-    not_got = ('Proxy Error|urgent maintenance|Not Found|Service Temporarily Unavailable' +
-               '|Internal server error|HTTP Error 50[17]|SQLState(?i)')
+    not_got = ('(?i)Proxy Error|urgent maintenance|Not Found|Service Temporarily Unavailable' +
+               '|Internal server error|HTTP Error 50[17]|SQLState')
 
     def alert(self, event, now):
         return now >= event.time and now < event.time.shift(minutes=5)
@@ -157,13 +157,13 @@ def prettify(s):
     if m:
         new = 'Making %sremarks at ' % (m.group(1) or '').lower()
         s = re.sub('^Addressing ', '', s)
-        if not re.match('The (?i)', s):
+        if not re.match('(?i)The ', s):
             new += 'the '
         return re.sub('^(.*) (?:.\200\223 |- |\[|{|\()(?:The )?Secretary-General (?:to|will) (?:make|deliver) ' +
                       '([Oo]pening |closing )?[rR]emarm?ks(\]|}|\))?', new + r'\1', s)
     if re.match('\[Remarks at\] ', s):
         return re.sub('\[Remarks at\] ', 'Making remarks at ', s)
-    if (re.search('Presentation of credential(?i)', s) or re.match('Remarks at', s) or re.match('Election of', s)
+    if (re.search('(?i)Presentation of credential', s) or re.match('Remarks at', s) or re.match('Election of', s)
             or re.match('Swearing[ -]in Ceremony', s)):
         pass
     elif (re.search('(?<!on )Youth$|^Sages Group|Messengers$|^Group of Friends|^Leaders|^Chairmen|' +
@@ -186,13 +186,13 @@ def prettify(s):
         if re.match('The ', s):
             s = re.sub('^The', 'the', s)
         s = 'Meeting %s' % s
-    elif (re.search('Delegation|Members(?i)', s)
-            and not re.search('(Joint.*Meeting|Group Meeting|concert|luncheon|breakfast)(?i)', s)):
+    elif (re.search('(?i)Delegation|Members', s)
+            and not re.search('(?i)(Joint.*Meeting|Group Meeting|concert|luncheon|breakfast)', s)):
         s = 'Meeting the %s' % s
     elif (re.search(r'Elder|High Representative|Chairman\b|Secretary-General of the League|Senior Adviser|' +
                     'Special Adviser|Special Representative|Permanent Representative|Minister of|' +
                     'Secretary of State for|Administrator|CEO|National Adviser|Ambassador|students|Students', s) and
-          not re.search('(concert|conversation|luncheon|breakfast|hosted by|hand-over|meeting|conference)(?i)', s)):
+          not re.search('(?i)(concert|conversation|luncheon|breakfast|hosted by|hand-over|meeting|conference)', s)):
         s = 'Meeting %s' % s
     elif re.match('The ', s):
         s = re.sub('^The ', 'Attending the ', s)
