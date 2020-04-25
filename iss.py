@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
-# iridium.py:
-# Twitter/Toot when Iridium/ISS are overhead.
+# iss.py:
+# Twitter/Toot when the ISS is overhead.
 #
 # Copyright (c) 2018 Matthew Somerville.
 # http://www.dracos.co.uk/
@@ -19,14 +19,9 @@ localfile = '/home/bots/data/%s'
 class Event(Event):
     @property
     def status(self):
-        if self.type == 'iridium':
-            return "Iridium flare: magnitude %s at %s, altitude %s, in direction %s (%s), from %s. Weather: %s." % (
-                self.magnitude, self.time.format('HH:mm:ss'), self.altitude,
-                self.azimuth, self.compass, self.name, self.weather)
-        if self.type == 'iss':
-            text = "ISS pass: magnitude %.1f, %s\u2013%s from %s to %s, maximum altitude %s at %s in %s. Weather: %s."
-            return (text % (float(self.magnitude), self.start_time, self.end_time, self.start_az, self.end_az,
-                            self.max_alt, self.max_time, self.max_az, self.weather))
+        text = "ISS pass: magnitude %.1f, %s\u2013%s from %s to %s, maximum altitude %s at %s in %s. Weather: %s."
+        return (text % (float(self.magnitude), self.start_time, self.end_time, self.start_az, self.end_az,
+                        self.max_alt, self.max_time, self.max_az, self.weather))
 
 
 def get_timestamp(s):
@@ -39,7 +34,7 @@ def get_timestamp(s):
     return str(s.timestamp)
 
 
-class IridiumBot(SchedulerBot):
+class ISSBot(SchedulerBot):
     choices = SchedulerBot.choices + ['weather']
 
     def __init__(self, name, latitude, longitude, altitude, forecastio_key):
@@ -71,21 +66,6 @@ class IridiumBot(SchedulerBot):
             fp.write("\t".join(out) + "\n")
         fp.close()
 
-        url = 'http://www.heavens-above.com/IridiumFlares.aspx?Dur=7&lat=%f&lng=%f&alt=%d&tz=GMT'
-        url = url % (self.latitude, self.longitude, self.altitude)
-        iridium = self.get_contents(url)
-        rows = re.findall('<tr[^>]*>\s*<td><a href="flaredetails[^"]*">(.*?)</a></td>\s*' +
-                          ('<td[^>]*>(.*?)</td>\s*' * 7), iridium)
-        fp = open(localfile % 'iridium.tsv', 'w')
-        for row in rows:
-            flare_timestamp, mag, altitude, azimuth, name, distance, brightness, sun = row
-            m = re.match('(.*?)\s+\((.*?)\)', azimuth)
-            azimuth, compass = m.groups()
-            timestamp = get_timestamp(flare_timestamp)
-            out = (timestamp, mag, altitude, azimuth, compass, name)
-            fp.write("\t".join(out) + "\n")
-        fp.close()
-
     def parse(self, warn=0):
         weather = json.load(open(localfile % 'weather.json'))
         if not weather:
@@ -94,19 +74,12 @@ class IridiumBot(SchedulerBot):
 
         events = []
 
-        flares = open(localfile % 'iridium.tsv')
-        for row in flares:
-            epoch, mag, altitude, azimuth, compass, name = row.strip().split("\t")
-            epoch = arrow.get(epoch, 'X').to('Europe/London')
-            events.append(Event(type='iridium', magnitude=mag, altitude=altitude, azimuth=azimuth,
-                                compass=compass, name=name, time=epoch, weather=weather_desc))
-
         iss = open(localfile % 'iss.tsv')
         for row in iss:
             epoch, mag, start_time, end_time, start_az, end_az, max_time, max_alt, max_az = row.strip().split("\t")
             epoch = arrow.get(epoch, 'X').to('Europe/London')
             events.append(
-                Event(type='iss', time=epoch,
+                Event(time=epoch,
                       magnitude=mag, start_time=start_time, end_time=end_time, start_az=start_az, end_az=end_az,
                       max_time=max_time, max_alt=max_alt, max_az=max_az, weather=weather_desc)
             )
@@ -118,4 +91,4 @@ class IridiumBot(SchedulerBot):
         return soon >= event.time and soon < event.time.shift(minutes=5)
 
 
-IridiumBot('abovebrum', LATITUDE, LONGITUDE, ALTITUDE, FORECASTIO_KEY).run()
+ISSBot('abovebrum', LATITUDE, LONGITUDE, ALTITUDE, FORECASTIO_KEY).run()
