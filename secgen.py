@@ -180,7 +180,7 @@ def prettify(s):
                   'Senator|(The )?R(igh)?t\.? Hon(ou?rable)?\.?|The Hon\.|Hon\.|U\.S\. House|U\.S\. Senator|' +
                   'US Congressman|Judge|Cardinal|Archbishop|The Honou?rable|Rabbi|Lt\.|Major General|Lieutenant|' +
                   'Excelent|Metropolitan|Psy|Thura|Lang Lang|Bahey|Antti|Bishop|Pastor|Shaykh|Srgjan|Michel|' +
-                  'Commissioner', s) and not re.search('luncheon(?i)', s):
+                  'Commissioner', s) and not re.search('(?i)luncheon', s):
         s = re.sub('Amb\.', 'Ambassador', s)
         s = re.sub('^Amb ', 'Ambassador ', s)
         if re.match('The ', s):
