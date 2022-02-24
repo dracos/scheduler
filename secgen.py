@@ -20,7 +20,7 @@ def remove_changing_bits(s):
 
 
 class SecgenBot(SchedulerBot):
-    localfile = '/home/bots/data/%s-schedule'
+    localfile = '/home/sympl/scheduler/data/%s-schedule'
 
     not_got = ('(?i)Proxy Error|urgent maintenance|Not Found|Service Temporarily Unavailable' +
                '|Internal server error|HTTP Error 50[17]|SQLState')

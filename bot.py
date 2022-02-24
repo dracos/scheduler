@@ -27,7 +27,6 @@ class Event(object):
 
 
 class SchedulerBot(Bot):
-    path = '/home/bots/scheduler/conf/'
     choices = ['fetch', 'post', 'test']
 
     def __init__(self, name):

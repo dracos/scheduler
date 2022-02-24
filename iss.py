@@ -13,7 +13,7 @@ from bot import SchedulerBot, Event
 from config import LATITUDE, LONGITUDE, ALTITUDE, FORECASTIO_KEY
 
 
-localfile = '/home/bots/data/%s'
+localfile = '/home/sympl/scheduler/data/%s'
 
 
 class Event(Event):
