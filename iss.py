@@ -31,7 +31,7 @@ def get_timestamp(s):
     # Deal with around New Year time
     if s < now:
         s = s.shift(years=1)
-    return str(s.timestamp)
+    return str(s.int_timestamp)
 
 
 class ISSBot(SchedulerBot):
