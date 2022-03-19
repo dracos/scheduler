@@ -1,5 +1,6 @@
 __pycache__
 config.py
+/conf
 /.venv
 /cron.log
 /data

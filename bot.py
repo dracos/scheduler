@@ -27,6 +27,7 @@ class Event(object):
 
 
 class SchedulerBot(Bot):
+    path = '/home/sympl/scheduler/conf/'
     choices = ['fetch', 'post', 'test']
 
     def __init__(self, name):
