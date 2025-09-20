@@ -59,7 +59,7 @@ class CBeebiesBot(SchedulerBot):
         events = []
         for broadcast in j['broadcasts']:
             image_pid = broadcast['programme']['image']['pid']
-            image_url = 'http://ichef.bbci.co.uk/images/ic/192x108/%s.jpg' % image_pid
+            image_url = 'http://ichef.bbci.co.uk/images/ic/1600x900/%s.jpg' % image_pid
             time = arrow.get(broadcast['start'])
             events.append(
                 Event(bot=self, time=time, programme=broadcast['programme'],
