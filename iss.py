@@ -24,6 +24,12 @@ class Event(Event):
                         self.max_alt, self.max_time, self.max_az, self.weather))
 
 
+class SpecialEvent(Event):
+    @property
+    def status(self):
+        return "This is just a test"
+
+
 def get_timestamp(s):
     s = arrow.get(s, ['MMM D, HH:mm:ss', 'MMM DD HH:mm:ss a', 'DD MMM HH:mm:ss'])
     now = arrow.now()
@@ -45,11 +51,11 @@ class ISSBot(SchedulerBot):
         super().__init__(name)
 
     def do_weather(self):
-        url = 'https://api.forecast.io/forecast/%s/%s,%s?units=uk2&exclude=minutely,hourly,daily,alerts,flags'
-        url = url % (self.forecastio_key, self.latitude, self.longitude)
+        url = "https://api.openweathermap.org/data/3.0/onecall?lat=%s&lon=%s&exclude=minutely&units=metric&appid=%s"
+        url = url % (self.latitude, self.longitude, self.forecastio_key)
         fp = self.get_contents(url)
         weather = json.loads(fp)
-        json.dump(weather['currently'], open(localfile % 'weather.json', 'w'))
+        json.dump(weather['current'], open(localfile % 'weather.json', 'w'))
 
     def fetch(self):
         url = 'http://www.heavens-above.com/PassSummary.aspx?satid=25544&lat=%f&lng=%f&alt=%d&tz=GMT'
@@ -70,9 +76,9 @@ class ISSBot(SchedulerBot):
         weather = json.load(open(localfile % 'weather.json'))
         if not weather:
             return []  # Problem with weather file
-        weather_desc = weather['summary']
+        weather_desc = weather['weather'][0]['description']
 
-        events = []
+        events = [] # SpecialEvent(time=arrow.get(str(1724879782+40*60), 'X').to('Europe/London'))]
 
         iss = open(localfile % 'iss.tsv')
         for row in iss:
