@@ -116,9 +116,11 @@ class SchedulerBot(Bot):
             headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 ' +
                        '(KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36'}
             try:
-                r = requests.get(s, headers=headers)
+                r = requests.get(s, headers=headers, timeout=30)
                 o = r.content if mode == 'binary' else r.text
             except requests.exceptions.ConnectionError:
+                o = ''
+            except requests.exceptions.Timeout:
                 o = ''
         else:
             mode = 'rb' if mode == 'binary' else 'rt'
