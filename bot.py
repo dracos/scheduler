@@ -12,7 +12,7 @@ import re
 import sys
 import requests
 import arrow
-from polybot import Bot
+from polybot import Bot, Image
 
 
 class Event(object):
@@ -107,7 +107,8 @@ class SchedulerBot(Bot):
         self.log.info('Posting at ' + arrow.now().format())
         for event in self.alert_on:
             if event.image:
-                self.post(event.status, imagefile=event.image, mime_type='image/jpeg', wrap=True)
+                im = Image(data=event.image, mime_type='image/jpeg', description="")
+                self.post(event.status, images=[im], wrap=True)
             else:
                 self.post(event.status, wrap=True)
 
