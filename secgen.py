@@ -12,7 +12,7 @@ import arrow
 from bs4 import BeautifulSoup
 from bot import SchedulerBot, Event
 
-REGEX_TIME = re.compile('(\*?(\d+)(?:(?::|\.)\s*(\d+)|\s*(a\.?m\.?|p\.?m\.?|noon))+\.?\s*\*?)')
+REGEX_TIME = re.compile(r'(\*?(\d+)(?:(?::|\.)\s*(\d+)|\s*(a\.?m\.?|p\.?m\.?|noon))+\.?\s*\*?)')
 
 
 def remove_changing_bits(s):
@@ -20,7 +20,7 @@ def remove_changing_bits(s):
 
 
 class SecgenBot(SchedulerBot):
-    localfile = '/home/sympl/scheduler/data/%s-schedule'
+    localfile = '/srv/scheduler/data/%s-schedule'
 
     not_got = ('(?i)Proxy Error|urgent maintenance|Not Found|Service Temporarily Unavailable' +
                '|Internal server error|HTTP Error 50[17]|SQLState')
@@ -32,7 +32,7 @@ class SecgenBot(SchedulerBot):
         return remove_changing_bits(a) != remove_changing_bits(b)
 
     def fetch(self):
-        new = self.get_contents('https://www.un.org/sg/en/content/sg/appointments-secretary-general')
+        new = self.get_contents('https://www.un.org/sg/en/sg-daily-schedules')
         return self.fetch_check_file(new)
 
     def parse(self, warn=0):
@@ -101,7 +101,7 @@ def titlecaseifuppercase(s):
 
 
 def prettify(s):
-    s = re.sub('^approx\. ', '', s)
+    s = re.sub(r'^approx\. ', '', s)
     s = ''.join(map(titlecaseifuppercase, re.split('([() ])', s)))
     s = s.replace('Secretery', 'Secretary')
     if (re.match('Addressing|Meeting (with|on)|Visiting|Visit to|Trilateral Meeting', s)
@@ -152,17 +152,17 @@ def prettify(s):
         return re.sub(('Remarks by the Secretary-General |SG remarks |' +
                        'Secretary(-| )General\'?s? (to (make|give) )?remarks |Welcoming Remarks '),
                       'Making remarks ', s)
-    m = re.search(' (?:.\200\223 |- |\[|{|\()(?:The )?Secretary-General (?:to|will) (?:make|deliver) ' +
-                  '([Oo]pening |closing )?[rR]emarks(\]|}|\))?\.?$', s)
+    m = re.search(r' (?:.\200\223 |- |\[|{|\()(?:The )?Secretary-General (?:to|will) (?:make|deliver) ' +
+                  r'([Oo]pening |closing )?[rR]emarks(\]|}|\))?\.?$', s)
     if m:
         new = 'Making %sremarks at ' % (m.group(1) or '').lower()
         s = re.sub('^Addressing ', '', s)
         if not re.match('(?i)The ', s):
             new += 'the '
-        return re.sub('^(.*) (?:.\200\223 |- |\[|{|\()(?:The )?Secretary-General (?:to|will) (?:make|deliver) ' +
-                      '([Oo]pening |closing )?[rR]emarks(\]|}|\))?', new + r'\1', s)
-    if re.match('\[Remarks at\] ', s):
-        return re.sub('\[Remarks at\] ', 'Making remarks at ', s)
+        return re.sub(r'^(.*) (?:.\200\223 |- |\[|{|\()(?:The )?Secretary-General (?:to|will) (?:make|deliver) ' +
+                      r'([Oo]pening |closing )?[rR]emarks(\]|}|\))?', new + r'\1', s)
+    if re.match(r'\[Remarks at\] ', s):
+        return re.sub(r'\[Remarks at\] ', 'Making remarks at ', s)
     if (re.search('(?i)Presentation of credential', s) or re.match('Remarks at', s) or re.match('Election of', s)
             or re.match('Swearing[ -]in Ceremony', s)):
         pass
@@ -175,13 +175,13 @@ def prettify(s):
         s = 'Meeting the %s' % s
     elif re.match(r'- Mr|His (Royal |Serene )?Highness|President|Association of|Vuk|Queen|Prince|Major-General|' +
                   'His Most|His Excellency|His Eminence|His Holiness|His Majesty|Her Majesty|Their Majesties|Ambassador\b|' +
-                  'H\.?R\.?H|H\. ?M\.|H\. ?H\.|H\.? ?E\.?|S\. ?E\.|Rev\.|The Very Rev|Sir|General (?!Assembly)|' +
-                  'H\.S\.H|\.?Mr\.?|Mrs\.|Prof\.|Dr\.?\b|Lord|Lady|Justice|Professor|Ms\.?|Amb\.?\b|Mayor|Messrs\.|' +
-                  'Senator|(The )?R(igh)?t\.? Hon(ou?rable)?\.?|The Hon\.|Hon\.|U\.S\. House|U\.S\. Senator|' +
-                  'US Congressman|Judge|Cardinal|Archbishop|The Honou?rable|Rabbi|Lt\.|Major General|Lieutenant|' +
+                  r'H\.?R\.?H|H\. ?M\.|H\. ?H\.|H\.? ?E\.?|S\. ?E\.|Rev\.|The Very Rev|Sir|General (?!Assembly)|' +
+                  r'H\.S\.H|\.?Mr\.?|Mrs\.|Prof\.|Dr\.?\b|Lord|Lady|Justice|Professor|Ms\.?|Amb\.?\b|Mayor|Messrs\.|' +
+                  r'Senator|(The )?R(igh)?t\.? Hon(ou?rable)?\.?|The Hon\.|Hon\.|U\.S\. House|U\.S\. Senator|' +
+                  r'US Congressman|Judge|Cardinal|Archbishop|The Honou?rable|Rabbi|Lt\.|Major General|Lieutenant|' +
                   'Excelent|Metropolitan|Psy|Thura|Lang Lang|Bahey|Antti|Bishop|Pastor|Shaykh|Srgjan|Michel|' +
                   'Commissioner', s) and not re.search('(?i)luncheon', s):
-        s = re.sub('Amb\.', 'Ambassador', s)
+        s = re.sub(r'Amb\.', 'Ambassador', s)
         s = re.sub('^Amb ', 'Ambassador ', s)
         if re.match('The ', s):
             s = re.sub('^The', 'the', s)
@@ -211,7 +211,7 @@ def parsecell(s, d=False):
     s = re.sub("<[^>]*>", "", s)
     s = re.sub("&nbsp;", " ", s)
     s = re.sub("&quot;", '"', s)
-    s = re.sub("\s+", " ", s)
+    s = re.sub(r"\s+", " ", s)
     s = s.strip(" ")
     s = unescape(s)
     return s
@@ -236,7 +236,7 @@ def unescape(text):
             except KeyError:
                 pass
         return text  # leave as is
-    return re.sub("&#?\w+;", fixup, text)
+    return re.sub(r"&#?\w+;", fixup, text)
 
 
 SecgenBot('secgen').run()

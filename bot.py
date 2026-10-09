@@ -27,7 +27,7 @@ class Event(object):
 
 
 class SchedulerBot(Bot):
-    path = '/home/sympl/scheduler/conf/'
+    path = '/srv/scheduler/conf/'
     choices = ['fetch', 'post', 'test']
 
     def __init__(self, name):
@@ -114,8 +114,8 @@ class SchedulerBot(Bot):
 
     def get_contents(self, s, mode='text'):
         if 'http://' in s or 'https://' in s:
-            headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 ' +
-                       '(KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36'}
+            headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 ' +
+                       '(KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36'}
             try:
                 r = requests.get(s, headers=headers, timeout=30)
                 o = r.content if mode == 'binary' else r.text

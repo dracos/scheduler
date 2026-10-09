@@ -32,7 +32,7 @@ class Event(Event):
 
 
 class CBeebiesBot(SchedulerBot):
-    localfile = '/home/sympl/scheduler/data/%s-schedule'
+    localfile = '/srv/scheduler/data/%s-schedule'
 
     not_got = 'Maintenance mode'
 

@@ -13,7 +13,7 @@ from bot import SchedulerBot, Event
 from config import LATITUDE, LONGITUDE, ALTITUDE, FORECASTIO_KEY
 
 
-localfile = '/home/sympl/scheduler/data/%s'
+localfile = '/srv/scheduler/data/%s'
 
 
 class Event(Event):
@@ -61,8 +61,8 @@ class ISSBot(SchedulerBot):
         url = 'http://www.heavens-above.com/PassSummary.aspx?satid=25544&lat=%f&lng=%f&alt=%d&tz=GMT'
         url = url % (self.latitude, self.longitude, self.altitude)
         iss = self.get_contents(url)
-        rows = re.findall('<tr class="clickableRow"[^>]*>\s*<td><a href="[^"]*" title="[^"]*">(.*?)</a></td>' +
-                          ('<td[^>]*>\s*(.*?)\s*</td>' * 11), iss)
+        rows = re.findall(r'<tr class="clickableRow"[^>]*>\s*<td><a href="[^"]*" title="[^"]*">(.*?)</a></td>' +
+                          (r'<td[^>]*>\s*(.*?)\s*</td>' * 11), iss)
         fp = open(localfile % 'iss.tsv', 'w')
         for row in rows:
             date, mag, start_time, start_alt, start_az, max_time, max_alt, max_az, \
