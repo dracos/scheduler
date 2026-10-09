@@ -31,7 +31,7 @@ class SpecialEvent(Event):
 
 
 def get_timestamp(s):
-    s = arrow.get(s, ['MMM D, HH:mm:ss', 'MMM DD HH:mm:ss a', 'DD MMM HH:mm:ss'])
+    s = arrow.get(s, ['MMM D, HH:mm:ss', 'MMM DD HH:mm:ss a', 'DD MMM HH:mm:ss', 'D MMM HH:mm:ss'])
     now = arrow.now()
     s = s.replace(year=now.year, tzinfo='Europe/London')
     # Deal with around New Year time
